@@ -6,9 +6,9 @@ import forms
 
 app = flask.Flask(__name__)
 app.config["SECRET_KEY"] = "This is secret key"
-app.config[
-    "SQLALCHEMY_DATABASE_URI"
-] = "postgresql://coe:CoEpasswd@localhost:5432/coedb"
+app.config["SQLALCHEMY_DATABASE_URI"] = (
+    "postgresql://coe:CoEpasswd@localhost:5432/coedb"
+)
 
 models.init_app(app)
 
@@ -75,7 +75,8 @@ def tags_view(tag_name):
         tag_name=tag_name,
         notes=notes,
     )
-    
+
+
 @app.route("/notes/edit/<int:note_id>", methods=["GET", "POST"])
 def notes_edit(note_id):
     db = models.db
@@ -85,22 +86,34 @@ def notes_edit(note_id):
         return flask.redirect(flask.url_for("index"))
 
     form = forms.NoteForm(obj=note)
-    form.tags.data = [tag.name for tag in note.tags] 
+    form.tags.data = [tag.name for tag in note.tags]
 
     if form.validate_on_submit():
         note.title = form.title.data
         note.description = form.description.data
 
-        current_tags = {tag.name for tag in note.tags}  
+        current_tags = {tag.name for tag in note.tags}
         new_tags = set(form.tags.data)
 
         for tag_name in current_tags - new_tags:
-            tag_to_remove = db.session.execute(db.select(models.Tag).where(models.Tag.name == tag_name)).scalars().first()
+            tag_to_remove = (
+                db.session.execute(
+                    db.select(models.Tag).where(models.Tag.name == tag_name)
+                )
+                .scalars()
+                .first()
+            )
             if tag_to_remove:
                 note.tags.remove(tag_to_remove)
 
         for tag_name in new_tags - current_tags:
-            tag = db.session.execute(db.select(models.Tag).where(models.Tag.name == tag_name)).scalars().first()
+            tag = (
+                db.session.execute(
+                    db.select(models.Tag).where(models.Tag.name == tag_name)
+                )
+                .scalars()
+                .first()
+            )
             if not tag:
                 tag = models.Tag(name=tag_name)
                 db.session.add(tag)
@@ -120,13 +133,18 @@ def notes_delete(note_id):
     if note:
         db.session.delete(note)
         db.session.commit()
-        
+
     return flask.redirect(flask.url_for("index"))
+
 
 @app.route("/tags/edit/<tag_name>", methods=["GET", "POST"])
 def tags_edit(tag_name):
     db = models.db
-    tag = db.session.execute(db.select(models.Tag).where(models.Tag.name == tag_name)).scalars().first()
+    tag = (
+        db.session.execute(db.select(models.Tag).where(models.Tag.name == tag_name))
+        .scalars()
+        .first()
+    )
 
     if not tag:
         return flask.redirect(flask.url_for("index"))
@@ -139,14 +157,22 @@ def tags_edit(tag_name):
 
     return flask.render_template("tags-edit.html", tag=tag)
 
+
 @app.route("/tags/delete/<string:tag_name>", methods=["POST"])
 def tags_delete(tag_name):
     db = models.db
-    tag = db.session.execute(db.select(models.Tag).where(models.Tag.name == tag_name)).scalars().first()
-    
+    tag = (
+        db.session.execute(db.select(models.Tag).where(models.Tag.name == tag_name))
+        .scalars()
+        .first()
+    )
+
     if tag:
-        db.session.execute(db.delete(models.NoteTag).where(models.NoteTag.tag_id == tag.id))
-        
+        db.session.execute(
+            db.delete(models.note_tag_m2m).where(models.note_tag_m2m.c.tag_id == tag.id)
+        )
+
+        # ลบ tag
         db.session.delete(tag)
         db.session.commit()
 

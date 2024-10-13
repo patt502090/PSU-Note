@@ -1,4 +1,5 @@
-{% extends 'base.html' %} {% block body %}
+{% extends 'base.html' %} 
+{% block body %}
 <ul class="nav justify-content-center" style="padding-top: 1em">
   <li class="nav-item">
     <a class="btn btn-primary" href="{{ url_for('notes_create') }}">Create</a>
@@ -27,28 +28,34 @@
     </div>
     <div class="card-text my-3">{{ note.description }}</div>
     <div class="card-footer text-muted">
-      Tags: {% for t in note.tags %}
-      <div class="d-flex justify-content-between align-items-center">
-        <a href="{{ url_for('tags_view', tag_name=t.name) }}">{{ t.name }}</a>
-        <div>
-          <a
-            class="btn btn-sm me-2 border"
-            href="{{ url_for('tags_edit', tag_name=t.name) }}"
-            >EDIT</a
-          >
-          <form
-            action="{{ url_for('tags_delete', tag_name=t.name) }}"
-            method="POST"
-            style="display: inline"
-          >
-            <button type="submit" class="btn btn-sm btn-danger">DELETE</button>
-          </form>
+      Tags: 
+      {% if note.tags|length > 0 %}
+        {% for t in note.tags %}
+        <div class="d-flex justify-content-between align-items-center">
+          <a href="{{ url_for('tags_view', tag_name=t.name) }}">{{ t.name }}</a>
+          <div>
+            <a
+              class="btn btn-sm me-2 border"
+              href="{{ url_for('tags_edit', tag_name=t.name) }}"
+              >EDIT</a
+            >
+            <form
+              action="{{ url_for('tags_delete', tag_name=t.name) }}"
+              method="POST"
+              style="display: inline"
+            >
+              <button type="submit" class="btn btn-sm btn-danger">DELETE</button>
+            </form>
+          </div>
         </div>
-      </div>
-      {% endfor %}
+        {% endfor %}
+      {% else %}
+        <span>No tags available.</span>
+      {% endif %}
       <br />
       Last update: {{ note.updated_date }}
     </div>
   </div>
 </div>
-{% endfor %} {% endblock %}
+{% endfor %} 
+{% endblock %}

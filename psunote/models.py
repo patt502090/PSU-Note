@@ -51,7 +51,3 @@ class Note(db.Model):
     created_date = mapped_column(sa.DateTime(timezone=True), server_default=func.now())
     updated_date = mapped_column(sa.DateTime(timezone=True), server_default=func.now())
 
-class NoteForm(FlaskForm):
-    title = StringField('Title', validators=[DataRequired()])
-    content = TextAreaField('Content', validators=[DataRequired()]) 
-    tags = SelectMultipleField('Tags') 

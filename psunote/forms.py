@@ -1,10 +1,10 @@
-from wtforms_sqlalchemy.orm import model_form
 from flask_wtf import FlaskForm
-from wtforms import Field, widgets
-
+from wtforms_sqlalchemy.orm import model_form
+from wtforms import Field, StringField, TextAreaField, SubmitField, validators
+from wtforms import widgets
 import models
 
-
+# Custom field for tags input
 class TagListField(Field):
     widget = widgets.TextInput()
 
@@ -30,14 +30,16 @@ class TagListField(Field):
     def _value(self):
         if self.data:
             return ", ".join(self.data)
-        else:
-            return ""
+        return ""
 
-
+# Base form for Note model
 BaseNoteForm = model_form(
-    models.Note, base_class=FlaskForm, exclude=["created_date", "updated_date"], db_session=True
+    models.Note,
+    base_class=FlaskForm,
+    exclude=["created_date", "updated_date"],
+    db_session=True
 )
 
-
 class NoteForm(BaseNoteForm):
-    tags = TagListField("Tag")
+    tags = TagListField("Tags") 
+    submit = SubmitField("Save Changes")

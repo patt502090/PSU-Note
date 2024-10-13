@@ -1,6 +1,5 @@
-{% extends 'base.html' %}
-{% block body %}
-<ul class="nav justify-content-center" style="padding-top: 1em;">
+{% extends 'base.html' %} {% block body %}
+<ul class="nav justify-content-center" style="padding-top: 1em">
   <li class="nav-item">
     <a class="btn btn-primary" href="{{ url_for('notes_create') }}">Create</a>
   </li>
@@ -8,20 +7,27 @@
 {% for note in notes %}
 <div class="card my-3">
   <div class="card-body">
-    <h4 class="card-title">{{ note.title }}</h4>
-    <div class="card-text my-3">
-      {{ note.description }}
+    <div class="d-flex justify-content-between align-items-center">
+      <h4 class="card-title">{{ note.title }}</h4>
+      <div>
+        <a class="btn btn-warning" href="{{ url_for('notes_create') }}">EDIT</a>
+        <a class="btn btn-danger" href="{{ url_for('notes_create') }}">DELETE</a>
+      </div>
     </div>
+    <div class="card-text my-3">{{ note.description }}</div>
     <div class="card-footer text-muted">
-      Tags: 
-      {% for t in note.tags %}
+      Tags: {% for t in note.tags %}
+      <div class="d-flex justify-content-between align-items-center">
         <a href="{{ url_for('tags_view', tag_name=t.name) }}">{{ t.name }}</a>
-    {% endfor %}
-      <br>
+        <div>
+          <a class="btn btn-sm me-2 border" href="{{ url_for('notes_create') }}">EDIT</a>
+          <a class="btn btn-sm me-2 border" href="{{ url_for('notes_create') }}">DELETE</a>
+        </div>
+      </div>
+      {% endfor %}
+      <br />
       Last update: {{ note.updated_date }}
     </div>
   </div>
 </div>
-{% endfor %}
-{% endblock %}
-
+{% endfor %} {% endblock %}

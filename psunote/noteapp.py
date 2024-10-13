@@ -75,6 +75,53 @@ def tags_view(tag_name):
         tag_name=tag_name,
         notes=notes,
     )
+    
+@app.route("/notes/edit/<int:note_id>", methods=["GET", "POST"])
+def notes_edit(note_id):
+    db = models.db
+    note = db.session.get(models.Note, note_id)
+
+    if not note:
+        return flask.redirect(flask.url_for("index"))
+
+    form = forms.NoteForm(obj=note)
+    form.tags.data = [tag.name for tag in note.tags] 
+
+    if form.validate_on_submit():
+        note.title = form.title.data
+        note.description = form.description.data
+
+        current_tags = {tag.name for tag in note.tags}  
+        new_tags = set(form.tags.data)
+
+        for tag_name in current_tags - new_tags:
+            tag_to_remove = db.session.execute(db.select(models.Tag).where(models.Tag.name == tag_name)).scalars().first()
+            if tag_to_remove:
+                note.tags.remove(tag_to_remove)
+
+        for tag_name in new_tags - current_tags:
+            tag = db.session.execute(db.select(models.Tag).where(models.Tag.name == tag_name)).scalars().first()
+            if not tag:
+                tag = models.Tag(name=tag_name)
+                db.session.add(tag)
+            note.tags.append(tag)
+
+        db.session.commit()
+        return flask.redirect(flask.url_for("index"))
+
+    return flask.render_template("notes-edit.html", form=form, note=note)
+
+
+@app.route("/notes/delete/<int:note_id>", methods=["POST"])
+def notes_delete(note_id):
+    db = models.db
+    note = db.session.get(models.Note, note_id)
+
+    if note:
+        db.session.delete(note)
+        db.session.commit()
+        
+    return flask.redirect(flask.url_for("index"))
 
 
 if __name__ == "__main__":

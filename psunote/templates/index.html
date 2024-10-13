@@ -10,8 +10,19 @@
     <div class="d-flex justify-content-between align-items-center">
       <h4 class="card-title">{{ note.title }}</h4>
       <div>
-        <a class="btn btn-warning" href="{{ url_for('notes_create') }}">EDIT</a>
-        <a class="btn btn-danger" href="{{ url_for('notes_create') }}">DELETE</a>
+        <a
+          class="btn btn-warning"
+          href="{{ url_for('notes_edit', note_id=note.id) }}"
+          >EDIT</a
+        >
+        <form
+          action="{{ url_for('notes_delete', note_id=note.id) }}"
+          method="POST"
+          style="display: inline"
+          onsubmit="return confirmDelete();"
+        >
+          <button type="submit" class="btn btn-danger">DELETE</button>
+        </form>
       </div>
     </div>
     <div class="card-text my-3">{{ note.description }}</div>
@@ -20,8 +31,12 @@
       <div class="d-flex justify-content-between align-items-center">
         <a href="{{ url_for('tags_view', tag_name=t.name) }}">{{ t.name }}</a>
         <div>
-          <a class="btn btn-sm me-2 border" href="{{ url_for('notes_create') }}">EDIT</a>
-          <a class="btn btn-sm me-2 border" href="{{ url_for('notes_create') }}">DELETE</a>
+          <a class="btn btn-sm me-2 border" href="{{ url_for('notes_create') }}"
+            >EDIT</a
+          >
+          <a class="btn btn-sm me-2 border" href="{{ url_for('notes_create') }}"
+            >DELETE</a
+          >
         </div>
       </div>
       {% endfor %}
